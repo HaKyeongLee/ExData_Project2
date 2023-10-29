@@ -16,19 +16,22 @@ head(NEI, n=10)
 SCCcoal <- SCC[grepl("coal", SCC$Short.Name, ignore.case = T),]
 NEIcoal <- NEI[NEI$SCC %in% SCCcoal$SCC,]
 
+## Aggregate NEIcoal Data
+AggNEIcoal <- aggregate(Emissions ~ year, NEIcoal, sum)
+
+## Rescale Emissions to Thousand Tons
+AggNEIcoal$Emissions <- AggNEIcoal$Emissions/1000
+
 ## Create a bar plot
 png("plot4.png")
 
 library(ggplot2)
-plot <- ggplot(data=NEIcoal, mapping=aes(x=year, y=Emissions, fill=type))
-plot + geom_bar(position="dodge", stat="sum") +
+plot <- ggplot(data=AggNEIcoal, mapping=aes(x=factor(year), y=Emissions))
+plot + geom_bar(position="dodge", stat="identity") +
     labs(x="Year",
-         y="PM2.5 Emission (Tons)",
+         y="PM2.5 Emission (Thousand Tons)",
          title="Amount of PM2.5 Emissions in the U.S.",
          subtitle="From Coal-Combustion Sources") +
     theme_bw() +
-    scale_size(guide="none") +
-    scale_x_continuous(breaks=c(1999, 2002, 2005, 2008)) +
-    guides(fill=guide_legend(title="Source Type"))
-
+    scale_size(guide="none")
 dev.off()

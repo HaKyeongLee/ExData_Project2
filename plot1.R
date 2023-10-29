@@ -11,10 +11,8 @@ table(NEI$year)   # There are only 1999, 2002, 2005, 2008 data.
                   # No need to extract any column.
 
 ## Sum Emissions Column by Year
-tapply(NEI$Emissions, NEI$year, sum)
-EmissionSum=c(7332967, 5635780, 5454703, 3464206)
-EmissionSumMil=EmissionSum/1000000
-year=c(1999, 2002, 2005, 2008)
+Agg <- aggregate(Emissions ~ year, NEI, sum)
+Agg$EmissionSumMil=Agg$Emission/1000000
 
 ## Create a Bar Plot
 #     1. Set the margin.
@@ -25,7 +23,7 @@ par(mar=c(3,5,3,1))
 
 png("plot1.png")
 plot(1, type="n")
-barplot(EmissionSumMil, names.arg=year,
+barplot(Agg$EmissionSumMil, names.arg=Agg$year,
         main="Amount of PM2.5 Emission in the U.S., 1999-2008",
         xlab="Year",
         ylab="PM2.5 Emission (Million Tons)",

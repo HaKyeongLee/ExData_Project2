@@ -10,21 +10,24 @@ SCC <- readRDS("Source_Classification_Code.rds")
 table(NEI$year)   # There are only 1999, 2002, 2005, 2008 data.
                   # No need to extract any column.
 
-## Extract On-Road Baltimore data
-NEIBaltimoreOR <- dplyr::filter(NEI, NEI$fips=="24510" & NEI$type=="ON-ROAD")
+## Extract Vehicle related Baltimore data
+SCCVehicle <- SCC[grepl("[Vv]ehicle", SCC$SCC.Level.Two, ignore.case=TRUE), ]
+NEIVehicle <- NEI[NEI$SCC %in% SCCVehicle$SCC,]
+NEIBaltimoreOR <- NEIVehicle[NEIVehicle$fips=="24510", ]
+
+## Aggregate NEIBaltimoreOR data
+AggNEIBaltimoreOR <- aggregate(Emissions ~ year, NEIBaltimoreOR, sum)
 
 ## Create a Bar Plot
 png("plot5.png")
 
 library(ggplot2)
-plot <- ggplot(data=NEIBaltimoreOR, mapping=aes(x=year, y=Emissions))
-plot + geom_bar(position="dodge", stat="sum") +
+plot <- ggplot(data=AggNEIBaltimoreOR, mapping=aes(x=factor(year), y=Emissions))
+plot + geom_bar(position="dodge", stat="identity") +
     labs(x="Year",
          y="PM2.5 Emission (Tons)",
          title="Amount of PM2.5 Emissions in the Baltimore City",
          subtitle="From Motor Vehicle Sources") +
     theme_bw() +
-    scale_size(guide="none") +
-    scale_x_continuous(breaks=c(1999, 2002, 2005, 2008))
-
+    scale_size(guide="none")
 dev.off()
